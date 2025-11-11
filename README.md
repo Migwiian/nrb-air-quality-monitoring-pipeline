@@ -1,3 +1,13 @@
-# NYC Taxi Data Pipeline
+# NYC Taxi Insights - Free Analytics Dashboard
 
-This repository contains the code and resources for a beginner data engineering project focusing on building an NYC taxi data pipeline.
+## Quick Start (5 minutes)
+1. Clone repo
+2. pip install -r requirements.txt  
+3. python app.py
+4. Open http://localhost:8501
+
+## Features
+- Daily trip volume trends
+- Revenue analysis by zone
+- Peak hour predictions
+- Free deployment on Streamlit Cloud

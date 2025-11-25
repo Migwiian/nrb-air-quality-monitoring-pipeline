@@ -1,0 +1,44 @@
+name: Daily Weather ETL Pipeline
+
+# The 'cron' schedule runs the pipeline daily at 00:00 EAT (midnight in Nairobi).
+# Since GitHub Actions uses UTC, 00:00 EAT corresponds to 21:00 UTC on the previous day.
+on:
+  schedule:
+    - cron: '0 21 * * *' 
+  # Allows the job to be triggered manually from the 'Actions' tab
+  workflow_dispatch:
+
+jobs:
+  run_etl:
+    # Uses a GitHub-hosted runner machine
+    runs-on: ubuntu-latest
+    
+    # Securely access the API key stored in GitHub Secrets
+    env:
+      OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
+
+    steps:
+      - name: ⬇️ Checkout Repository
+        # Action to pull your code onto the runner machine
+        uses: actions/checkout@v4
+      
+      - name: 🐍 Set up Python 3.12
+        # Action to install the correct Python environment
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: 📦 Install Dependencies
+        # Installs all packages from requirements.txt
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      
+      - name: 🛠️ Create Data Directory
+        # Creates the 'data/' directory needed for SQLite to run
+        run: mkdir -p data
+        
+      - name: ▶️ Run Weather ETL Script
+        # Executes the script. Since we are at the project root, the relative
+        # path 'data/weather_data.db' inside the script works correctly.
+        run: python scripts/weather_etl.py

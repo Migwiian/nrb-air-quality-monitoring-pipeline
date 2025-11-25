@@ -1,4 +1,3 @@
-cat << 'EOF' > .github/workflows/daily_etl.yml
 name: Daily Weather ETL Pipeline
 
 # The 'cron' schedule runs the pipeline daily at 00:00 EAT (midnight in Nairobi).
@@ -66,4 +65,3 @@ jobs:
           else
             echo "No changes detected in the database. Skipping commit."
           fi
-EOF

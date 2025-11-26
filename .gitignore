@@ -209,5 +209,6 @@ __marimo__/
 logs/
 data/
 !data/weather_data.db
+!data/.gitkeep
 venv/
 

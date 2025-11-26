@@ -37,28 +37,10 @@ jobs:
         
       - name: Commit and Push Updated Database
         run: |
-          echo "=== Current directory structure ==="
-          ls -la
-          echo "=== Data directory contents ==="
-          ls -la data/ || echo "Data directory doesn't exist"
-          echo "=== Checking if database file exists ==="
-          ls -la data/weather_data.db || echo "Database file doesn't exist"
-          
           git config user.name 'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
           
-          echo "=== Git status before add ==="
-          git status
-          echo "=== Git ignore check ==="
-          git check-ignore -v data/weather_data.db || echo "File not ignored"
-          
-          echo "=== Attempting force add ==="
-          git add -f data/weather_data.db
-          
-          echo "=== Git status after add ==="
-          git status
-          echo "=== Staged changes ==="
-          git diff --cached --name-only
+          git add data/weather_data.db
           
           if ! git diff --cached --quiet; then
             git commit -m "data: Automated DB update via ETL action [skip ci]"

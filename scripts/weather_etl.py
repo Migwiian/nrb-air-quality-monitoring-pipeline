@@ -4,7 +4,9 @@ import pandas as pd
 import sqlite3
 from datetime import datetime
 import os
+from dotenv import load_dotenv
 
+load_dotenv()
 def extract_weather_data():
     lat, lon = -1.2921, 36.8219
     api_key = os.getenv('OPENWEATHER_API_KEY')

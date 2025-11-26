@@ -207,7 +207,7 @@ marimo/_static/
 marimo/_lsp/
 __marimo__/
 logs/
-data/
-*.db
-venv/
+data/*
 !data/weather_data.db
+venv/
+

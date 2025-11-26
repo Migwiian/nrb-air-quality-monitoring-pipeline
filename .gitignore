@@ -144,6 +144,7 @@ ENV/
 env.bak/
 venv.bak/
 
+
 # Spyder project settings
 .spyderproject
 .spyproject
@@ -209,3 +210,4 @@ logs/
 data/
 *.db
 venv/
+!data/weather_data.db

@@ -33,7 +33,7 @@ jobs:
         run: mkdir -p data
         
       - name: Run Weather ETL Script
-        run: python -m scripts/weather_etl.py
+        run: python -m scripts/weather_etl
         
       - name: Commit and Push Updated Database
         run: |

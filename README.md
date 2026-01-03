@@ -1,88 +1,85 @@
 # 🇰🇪 Nairobi Air Quality & Weather Data Pipeline
 
-This project collects weather data for Nairobi every 30 minutes and stores it in a database. I built this to learn the basics of data engineering—how to **extract** data from an API, **transform** it, and **load** it into a database (ETL).
+An automated, cloud-native ETL pipeline that monitors Nairobi's atmospheric conditions. This project demonstrates the transition from a local SQLite prototype to a production-ready architecture using Cloud PostgreSQL and GitHub Actions.
 
----
+## Project Overview
+The goal of this project is to provide a reliable, historical record of weather and air quality metrics for Nairobi. The pipeline is fully autonomous, handling data ingestion, cleaning, and storage without manual intervention.
 
-## 🚀 What I Built
+## Project Structure
 
-The project is an automated ETL pipeline with a monitoring system and a simple visualization layer.
+.
+├── .github/
+│   └── workflows/
+│       └── daily_etl.yml       # The "Brain" (Orchestration)
+├── scripts/
+│   └── weather_etl.py          # The "Muscle" (Logic)
+├── app.py                      # The "Face" (Streamlit Dashboard)
+├── requirements.txt            # The "Dependencies"
+├── .gitignore                  # The "Privacy Filter"
+└── README.md                   # The "Guide"
 
-* **Data Collection:** Gets current weather data from the [OpenWeatherMap API](https://openweathermap.org/api).
-* **Data Processing:** Cleans the data and adds **calculated fields** (e.g., heat index).
-* **Database Storage:** Stores all historical data in **SQLite** (`data/weather_data.db`).
-* **Monitoring:** Includes logging for errors and data quality issues, stored in a dedicated log file.
-* **Dashboard:** Provides a simple web interface (using Streamlit) to view the collected data.
 
----
 
-## 🛠️ Technical Details
+## The Evolution: From Local to Cloud
+This project highlights a significant architectural upgrade:
+* **Old Version:** Used local SQLite and `cron` jobs (limited to one machine).
+* **Current Version:** Uses **Neon PostgreSQL (Cloud)** and **GitHub Actions** (Global accessibility and high availability).
 
-The pipeline runs every **30 minutes** using a **cron job** and follows a basic **ETL pattern**:
+## Technical Stack
+* **Orchestration:** GitHub Actions (CI/CD)
+* **Language:** Python 3.12
+* **Data Processing:** Pandas
+* **Database:** PostgreSQL (Managed via Neon)
+* **Interface:** SQLAlchemy (ORM)
+* **Visualization:** Streamlit Cloud
 
-* **Extract:** Pulls current weather conditions for Nairobi.
-* **Transform:** Cleans the data and adds derived metrics like **heat index**.
-* **Load:** Stores data in the database with quality checks.
+## Architecture (ETL)
+1. **Extract:** Fetching real-time weather data from the OpenWeatherMap API for Nairobi coordinates.
+2. **Transform:** * Sanitizing data types and handling missing values.
+    * Calculating derived metrics like the **Heat Index**.
+    * Implementing string sanitization for secure database connections.
+3. **Load:** Appending cleaned records to a managed PostgreSQL instance with error handling and logging.
 
-The project is built entirely with **Python**, utilizing **SQLite**, and the dashboard uses **Streamlit**.
+## Setup & Installation
 
----
+### Local Development
+1. **Clone the repository:**
+   ```bash
+   git clone [https://github.com/Migwiian/nrb-air-quality-monitoring-pipeline.git](https://github.com/Migwiian/nrb-air-quality-monitoring-pipeline.git)
+   cd nrb-air-quality-monitoring-pipeline
+   ```
 
-## ⚙️ Setup Instructions
+2.  Setup Virtual Environment:
 
-Follow these steps to get the pipeline running locally:
+``` Bash
 
-### A. Environment Setup
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+``` 
+3. Configure Secrets: Create a .env file or export your variables: 
 
-1.  **Clone** this repository.
-    ```bash
-    git clone [YOUR_REPO_URL]
-    cd nrb-air-quality-monitoring-pipeline
-    ```
-2.  **Create and activate** the Python virtual environment (`venv`).
-    ```bash
-    python3 -m venv venv
-    source venv/bin/activate
-    ```
-3.  **Install requirements:**
-    ```bash
-    pip install -r requirements.txt
-    ```
+``` Bash
+export OPENWEATHER_API_KEY='your_api_key'
+export DATABASE_URL='postgresql://user:password@host/dbname?sslmode=require'
+``` 
+4. Run Manually:
 
-### B. Initial Run & API Configuration
+``` Bash
 
-1.  Get an **OpenWeatherMap API key** from their website (free tier is sufficient).
-2.  **Set the API Key** and run the ETL once to create the database file and confirm setup.
-    ```bash
-    export OPENWEATHER_API_KEY='YOUR_API_KEY_HERE'
-    python scripts/weather_etl.py
-    ```
+python scripts/weather_etl.py
+``` 
 
-### C. Automation with Cron
+## Cloud Deployment
+The pipeline is automated via .github/workflows/daily_etl.yml. To replicate:
 
-To set up the automated scheduler (which runs every 30 minutes):
+* Add OPENWEATHER_API_KEY and DATABASE_URL to GitHub Repository Secrets.
 
-1.  **Install Cron** (if necessary, e.g., in Codespaces):
-    ```bash
-    sudo apt update && sudo apt install cron -y
-    sudo service cron start
-    ```
-2.  **Create the logs directory:**
-    ```bash
-    mkdir -p logs
-    ```
-3.  **Edit your crontab** with `crontab -e` and paste the job command (replace the placeholder with your actual API key):
-    ```cron
-    */30 * * * * bash -c 'export OPENWEATHER_API_KEY="YOUR_API_KEY_HERE" && /workspaces/nrb-air-quality-monitoring-pipeline/venv/bin/python /workspaces/nrb-air-quality-monitoring-pipeline/scripts/weather_etl.py >> /workspaces/nrb-air-quality-monitoring-pipeline/logs/weather_etl.log 2>&1'
-    ```
-4.  **Monitor the run** and check the log file for success:
-    ```bash
-    cat logs/weather_etl.log
-    ```
+* The workflow will run daily at 9 PM (UTC) or can be triggered manually via the Actions tab.
 
-### D. Dashboard
+## Technical Challenges Overcome
+1. Environment Parity: Resolved SQLAlchemy connection errors between local Linux and GitHub Ubuntu-latest runners by implementing strict URL sanitization.
 
-View the dashboard locally:
-```bash
-streamlit run app.py
-```
+2. Security: Implemented the "Principle of Least Privilege" by using GitHub Secrets instead of hardcoding credentials.
+
+3. CI/CD Resiliency: Optimized GitHub Action YAML to handle specific Personal Access Token (PAT) scopes for workflow updates.

@@ -8,32 +8,26 @@ DB_PATH = 'data/weather_data.db'
 TABLE_NAME = 'weather_readings'
 
 def fetch_data():
-    """Fetches the last 100 weather readings from the SQLite database."""
-    # Ensure the data directory exists (though the ETL script should handle this)
-    if not os.path.exists('data'):
-        return None, "Data directory not found. Run ETL first."
-
-    # Check if the database file exists
-    if not os.path.exists(DB_PATH):
-        return None, f"Database file '{DB_PATH}' not found. Run the ETL pipeline."
-
+    """Fetches the last 100 weather readings from the Cloud Database."""
     try:
-        conn = sqlite3.connect(DB_PATH)
-        # Fetch the last 100 records ordered by timestamp descending
-        query = f"SELECT * FROM {TABLE_NAME} ORDER BY timestamp DESC LIMIT 100"
-        df = pd.read_sql_query(query, conn)
-        conn.close()
+        # 1. Establish connection (Uses your DATABASE_URL secret)
+        conn = st.connection("postgresql", type="sql")
+        
+        # 2. Query the cloud DB
+        # Streamlit handles the connection closure and the ttl (caching)
+        df = conn.query(f"SELECT * FROM {TABLE_NAME} ORDER BY timestamp DESC LIMIT 100", ttl="10m")
+        
+        if df.empty:
+            return None, "Database is empty. Wait for ETL to run."
 
-        # Convert timestamp to datetime and ensure correct order (oldest first for charts)
+        # 3. Clean up data for the charts
         df['timestamp'] = pd.to_datetime(df['timestamp'])
         df = df.sort_values(by='timestamp', ascending=True).reset_index(drop=True)
 
         return df, None
-    except sqlite3.OperationalError as e:
-        # Catch errors like 'no such table'
-        return None, f"Database operational error: {e}. Check if the '{TABLE_NAME}' table exists."
     except Exception as e:
-        return None, f"An unexpected error occurred: {e}"
+        # This catches connection issues, SQL typos, etc.
+        return None, f"Pipeline Error: {e}"
 
 
 st.set_page_config(

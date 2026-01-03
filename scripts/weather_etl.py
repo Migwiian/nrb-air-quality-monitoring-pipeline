@@ -4,6 +4,8 @@ import pandas as pd
 import sqlite3
 from datetime import datetime
 import os
+import sqlalchemy
+from sqlalchemy import create_engine
 
 try:
     from dotenv import load_dotenv
@@ -34,16 +36,33 @@ def transform_data(raw_data):
     df['heat_index'] = df['temperature'] + (df['humidity'] * 0.1)
     return df
 
-def load_data_to_database(df, db_name='data/weather_data.db'):
-    conn = sqlite3.connect(db_name)
-    df.to_sql('weather_readings', conn, if_exists='append', index=False)
-    conn.close()
+import sqlalchemy
+from sqlalchemy import create_engine
+import os
+
+# ... (keep your extract and transform functions the same)
+
+def load_data_to_database(df):
+    # 1. Get the connection string from GitHub Secrets / Env
+    # Format: postgresql://user:pass@host:port/dbname
+    db_url = os.getenv('DATABASE_URL') 
+    
+    if not db_url:
+        raise ValueError("DATABASE_URL not found!")
+
+    # 2. Create the engine
+    # We use 'postgresql+psycopg2' to specify the driver
+    engine = create_engine(db_url)
+    
+    # 3. Load data
+    # index=False prevents creating a "level_0" column in your DB
+    df.to_sql('weather_readings', engine, if_exists='append', index=False)
 
 def main():
     raw_data = extract_weather_data()
     df = transform_data(raw_data)
     load_data_to_database(df)
-    print("Data loaded successfully!")
+    print("🚀 Data successfully pushed to the Cloud Database!")
 
 if __name__ == "__main__":
     main()

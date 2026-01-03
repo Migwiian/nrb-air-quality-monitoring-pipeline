@@ -27,6 +27,6 @@ jobs:
         env:
           # This pulls the "keys" you saved in Step 1
           OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DATABASE_URL: '${{ secrets.DATABASE_URL }}'
         run: python scripts/weather_etl.py
 # Last sync: 2026-01-03T12:00:00+00:00

@@ -1,10 +1,6 @@
 import streamlit as st
 import pandas as pd
-import sqlite3
-import os
 
-# Define the database path relative to the app
-DB_PATH = 'data/weather_data.db'
 TABLE_NAME = 'weather_readings'
 
 def fetch_data():
@@ -37,7 +33,7 @@ st.set_page_config(
 )
 
 st.title("🇰🇪 Nairobi Weather Data Pipeline Dashboard")
-st.markdown("A real-time monitoring dashboard for weather data collected every 30 minutes via the ETL pipeline.")
+st.markdown("A monitoring dashboard for weather data collected daily at 21:00 UTC via the ETL pipeline.")
 
 data, error = fetch_data()
 
@@ -82,6 +78,6 @@ else:
         df_metrics, 
         use_container_width=True,
         # Hide the system-generated columns for cleanliness
-        column_order=['timestamp', 'temperature', 'humidity', 'pressure', 'wind_speed', 'description'],
+        column_order=['timestamp', 'temperature', 'humidity', 'pressure', 'wind_speed', 'weather_condition', 'heat_index'],
         hide_index=True
     )
